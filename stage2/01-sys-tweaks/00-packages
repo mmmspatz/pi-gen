@@ -14,7 +14,6 @@ luajit
 ca-certificates curl
 fake-hwclock nfs-common usbutils
 dosfstools
-dphys-swapfile
 raspberrypi-sys-mods
 pi-bluetooth
 apt-listchanges
@@ -37,3 +36,4 @@ unzip zip p7zip-full
 file
 kms++-utils
 python3-venv
+btrfs-progs
