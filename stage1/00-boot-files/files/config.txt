@@ -60,3 +60,4 @@ dtparam=audio=on
 dtoverlay=vc4-kms-v3d
 max_framebuffers=2
 arm_64bit=1
+initramfs initrd8.img followkernel
