@@ -1,0 +1,11 @@
+--- a/rootfs/lib/raspi-config/init_resize.sh
++++ b/rootfs/lib/raspi-config/init_resize.sh
+@@ -166,7 +166,7 @@
+     fi
+   fi
+ 
+-  if ! parted -m "$ROOT_DEV" u s resizepart "$ROOT_PART_NUM" "$TARGET_END"; then
++  if ! parted -m "$ROOT_DEV" u s resizepart "$ROOT_PART_NUM" yes "$TARGET_END"; then
+     FAIL_REASON="Root partition resize failed"
+     return 1
+   fi
