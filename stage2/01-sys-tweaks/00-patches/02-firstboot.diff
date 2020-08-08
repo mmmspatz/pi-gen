@@ -1,0 +1,45 @@
+--- a/rootfs/usr/lib/raspberrypi-sys-mods/firstboot
++++ b/rootfs/usr/lib/raspberrypi-sys-mods/firstboot
+@@ -26,13 +26,14 @@ check_noobs () {
+ }
+ 
+ get_variables () {
+-  ROOT_PART_DEV=$(findmnt / -o source -n)
++  ROOT_PART_DEV=$(findmnt / -o source -nv)
++  ROOT_PART_FSTYPE=$(findmnt / -o fstype -n)
+   ROOT_PART_NAME=$(echo "$ROOT_PART_DEV" | cut -d "/" -f 3)
+   ROOT_DEV_NAME=$(echo /sys/block/*/"${ROOT_PART_NAME}" | cut -d "/" -f 4)
+   ROOT_DEV="/dev/${ROOT_DEV_NAME}"
+   ROOT_PART_NUM=$(cat "/sys/block/${ROOT_DEV_NAME}/${ROOT_PART_NAME}/partition")
+ 
+-  BOOT_PART_DEV=$(findmnt /boot -o source -n)
++  BOOT_PART_DEV=$(findmnt /boot -o source -nv)
+   BOOT_PART_NAME=$(echo "$BOOT_PART_DEV" | cut -d "/" -f 3)
+   BOOT_DEV_NAME=$(echo /sys/block/*/"${BOOT_PART_NAME}" | cut -d "/" -f 4)
+   BOOT_PART_NUM=$(cat "/sys/block/${BOOT_DEV_NAME}/${BOOT_PART_NAME}/partition")
+@@ -157,13 +158,23 @@ do_resize () {
+     fi
+   fi
+ 
+-  if ! parted -m "$ROOT_DEV" u s resizepart "$ROOT_PART_NUM" "$TARGET_END"; then
++  if ! printf "resizepart %s\nyes\n%ss\n" "$ROOT_PART_NUM" "$TARGET_END" | parted "$ROOT_DEV" ---pretend-input-tty; then
+     FAIL_REASON="Partition table resize of the root partition ($ROOT_PART_DEV) failed\n$FAIL_REASON"
+     return 1
+   fi
+ 
+   mount -o remount,rw /
+-  resize2fs "$ROOT_PART_DEV" > /dev/null 2>&1
++  case "$ROOT_PART_FSTYPE" in
++    ext[2-4])
++      resize2fs "$ROOT_PART_DEV" > /dev/null 2>&1
++      ;;
++    btrfs)
++      btrfs filesystem resize max / > /dev/null 2>&1
++      ;;
++    *)
++      false;
++      ;;
++  esac
+   RET="$?"
+   if [ "$RET" -ne 0 ]; then
+     FAIL_REASON="Root partition resize failed\n$FAIL_REASON"

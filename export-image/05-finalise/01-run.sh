@@ -95,8 +95,15 @@ fi
 
 ROOT_DEV="$(awk "\$2 == \"${ROOTFS_DIR}\" {print \$1}" /etc/mtab)"
 
+
+# Remount without specifying a subvol
 unmount "${ROOTFS_DIR}"
-zerofree "${ROOT_DEV}"
+mount -v "$ROOT_DEV" "${ROOTFS_DIR}" -t btrfs
+
+btrfs subvolume snapshot -r "${ROOTFS_DIR}/@root" "${ROOTFS_DIR}/@root_initial"
+btrfs send "${ROOTFS_DIR}/@root_initial" | zstd -o "$DEPLOY_DIR/$(basename ${IMG_FILE}).root_subvol.zstd"
+
+unmount "${ROOTFS_DIR}"
 
 unmount_image "${IMG_FILE}"
 
