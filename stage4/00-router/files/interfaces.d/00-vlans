@@ -1,0 +1,5 @@
+# WAN (Configured by systemd-networkd):
+auto wan0
+iface wan0 inet manual
+up /usr/sbin/tc qdisc replace root dev wan0 cake bandwidth 12Mbit docsis dual-srchost nat
+

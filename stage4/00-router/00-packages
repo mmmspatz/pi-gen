@@ -1,0 +1,9 @@
+nftables
+vlan
+bridge-utils
+tcpdump
+ldnsutils
+arping
+iperf3
+conntrack
+vim

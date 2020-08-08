@@ -1,0 +1,9 @@
+SUBSYSTEM!="net", GOTO="custom_net_end"
+ACTION!="add", GOTO="custom_net_end"
+ENV{DEVTYPE}=="vlan", GOTO="custom_net_end"
+ENV{DEVTYPE}=="wlan", GOTO="custom_net_end"
+
+SUBSYSTEMS=="platform", ATTR{queues/rx-0/rps_cpus}="4", NAME="wan0"
+SUBSYSTEMS=="pci", ATTR{queues/rx-0/rps_cpus}="2", NAME="eth0"
+
+LABEL="custom_net_end"

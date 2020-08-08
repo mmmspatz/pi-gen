@@ -1,0 +1,17 @@
+[Match]
+Name=wan0
+
+[Link]
+MACAddress=58:63:64:35:4b:13
+
+[Network]
+DHCP=yes
+IPv6AcceptRA=yes
+
+[DHCPv4]
+UseDNS=no
+
+[DHCPv6]
+UseDNS=no
+PrefixDelegationHint=::/60
+
