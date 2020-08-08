@@ -30,7 +30,7 @@ truncate -s "${IMG_SIZE}" "${IMG_FILE}"
 
 parted --script "${IMG_FILE}" mklabel msdos
 parted --script "${IMG_FILE}" unit B mkpart primary fat32 "${BOOT_PART_START}" "$((BOOT_PART_START + BOOT_PART_SIZE - 1))"
-parted --script "${IMG_FILE}" unit B mkpart primary ext4 "${ROOT_PART_START}" "$((ROOT_PART_START + ROOT_PART_SIZE - 1))"
+parted --script "${IMG_FILE}" unit B mkpart primary btrfs "${ROOT_PART_START}" "$((ROOT_PART_START + ROOT_PART_SIZE - 1))"
 
 echo "Creating loop device..."
 cnt=0
@@ -48,16 +48,14 @@ done
 BOOT_DEV="${LOOP_DEV}p1"
 ROOT_DEV="${LOOP_DEV}p2"
 
-ROOT_FEATURES="^huge_file"
-for FEATURE in 64bit; do
-if grep -q "$FEATURE" /etc/mke2fs.conf; then
-	ROOT_FEATURES="^$FEATURE,$ROOT_FEATURES"
-fi
-done
 mkdosfs -n boot -F 32 -s 4 -v "$BOOT_DEV" > /dev/null
-mkfs.ext4 -L rootfs -O "$ROOT_FEATURES" "$ROOT_DEV" > /dev/null
+mkfs.btrfs -L rootfs "$ROOT_DEV" > /dev/null
 
-mount -v "$ROOT_DEV" "${ROOTFS_DIR}" -t ext4
+mount -v "$ROOT_DEV" "${ROOTFS_DIR}" -t btrfs
+btrfs sub create "${ROOTFS_DIR}/@root"
+unmount "${ROOTFS_DIR}"
+
+mount -v "$ROOT_DEV" "${ROOTFS_DIR}" -t btrfs -ocompress=zstd:15,subvol=@root
 mkdir -p "${ROOTFS_DIR}/boot"
 mount -v "$BOOT_DEV" "${ROOTFS_DIR}/boot" -t vfat
 
