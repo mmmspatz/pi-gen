@@ -1,0 +1,22 @@
+# WAN (Configured by dhcpcd):
+auto eth0.100
+iface eth0.100 inet manual
+
+# LAN
+auto br0
+iface br0 inet static
+	address 192.168.69.1/24
+	bridge_ports eth0
+
+# IOT devices
+auto eth0.2
+iface eth0.2 inet static
+	address 192.168.70.1/24
+
+# IPV6 via hurricane electric tunnel
+auto eth0.3
+iface eth0.3 inet static
+	address 192.168.71.1/24
+iface eth0.3 inet6 static
+	address 2001:470:1f07:93a::1/64
+

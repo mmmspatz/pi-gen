@@ -1,0 +1,11 @@
+dnsmasq
+nftables
+vlan
+radvd
+bridge-utils
+tcpdump
+ldnsutils
+arping
+iperf3
+conntrack
+vim
