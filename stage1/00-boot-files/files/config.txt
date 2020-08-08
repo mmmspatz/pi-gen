@@ -46,4 +46,5 @@ arm_boost=1
 otg_mode=1
 
 [all]
+initramfs initrd8.img followkernel
 
