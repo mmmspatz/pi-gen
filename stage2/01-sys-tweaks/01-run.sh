@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-install -m 755 files/resizebtrfs_once	"${ROOTFS_DIR}/etc/init.d/"
-
 install -d				"${ROOTFS_DIR}/etc/systemd/system/rc-local.service.d"
 install -m 644 files/ttyoutput.conf	"${ROOTFS_DIR}/etc/systemd/system/rc-local.service.d/"
 
@@ -32,20 +30,12 @@ if [ "${ENABLE_SSH}" == "1" ]; then
 else
 	systemctl disable ssh
 fi
-systemctl enable regenerate_ssh_host_keys
 EOF
 
 if [ "${USE_QEMU}" = "1" ]; then
 	echo "enter QEMU mode"
 	install -m 644 files/90-qemu.rules "${ROOTFS_DIR}/etc/udev/rules.d/"
-	on_chroot << EOF
-systemctl disable resizebtrfs_once
-EOF
-	echo "leaving QEMU mode"
-else
-	on_chroot << EOF
-systemctl enable resizebtrfs_once
-EOF
+	echo "leaving QEMU mode"Z
 fi
 
 on_chroot <<EOF
@@ -64,5 +54,3 @@ EOF
 on_chroot << EOF
 usermod --pass='*' root
 EOF
-
-rm -f "${ROOTFS_DIR}/etc/ssh/"ssh_host_*_key*

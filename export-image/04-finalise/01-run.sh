@@ -80,6 +80,9 @@ ROOT_DEV="$(mount | grep "${ROOTFS_DIR} " | cut -f1 -d' ')"
 
 unmount "${ROOTFS_DIR}"
 
+# Make the rootfs a seed volume
+btrfstune -S 1 "${ROOT_DEV}"
+
 unmount_image "${IMG_FILE}"
 
 mkdir -p "${DEPLOY_DIR}"

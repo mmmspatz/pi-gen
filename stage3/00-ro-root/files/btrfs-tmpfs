@@ -1,0 +1,40 @@
+#!/bin/sh
+PREREQ=""
+prereqs()
+{
+        echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+. /scripts/functions
+
+# If the root device is a btrfs seed, add a ram-backed rw device to the filesystem
+if [ "${ROOTFSTYPE}" = btrfs ] && \
+   ROOT_DEV=$(resolve_device ${ROOT}) && \
+   btrfs inspect-internal dump-super ${ROOT_DEV} | grep -q SEEDING;
+then
+        IMG_DIR="/ramdisk/"
+        IMG_FILE="${IMG_DIR}/btrfs_rw.img"
+
+        # Make a 1GB image file in a tmpfs
+        mkdir ${IMG_DIR}
+        mount -t tmpfs tmpfs ${IMG_DIR}
+        truncate -s 1G ${IMG_FILE}
+
+        # Add the image file to the btrfs seed device
+        LOOP_DEV=$(losetup -f)
+        losetup ${LOOP_DEV} ${IMG_FILE}
+        btrfs device add $LOOP_DEV ${rootmnt}
+
+        # Move the tmpfs mount point into the actual root
+        # mkdir ${rootmnt}/${IMG_DIR}
+        mount -n -o move ${IMG_DIR} ${rootmnt}/${IMG_DIR}
+fi
+
+exit 0
