@@ -1,5 +1,4 @@
-ARG BASE_IMAGE=debian:buster
-FROM ${BASE_IMAGE}
+FROM debian:buster
 
 ENV DEBIAN_FRONTEND noninteractive
 
