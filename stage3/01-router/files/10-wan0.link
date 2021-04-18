@@ -1,0 +1,5 @@
+[Match]
+MACAddress=8c:ae:4c:d6:6b:c9
+
+[Link]
+Name=wan0

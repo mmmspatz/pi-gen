@@ -1,4 +1,4 @@
 # Don't overwrite /etc/resolf.conf
 nohook resolv.conf
 
-allowinterfaces eth0.100
+allowinterfaces wan0

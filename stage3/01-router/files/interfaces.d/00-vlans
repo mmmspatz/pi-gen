@@ -1,6 +1,6 @@
 # WAN (Configured by dhcpcd):
-auto eth0.100
-iface eth0.100 inet manual
+auto wan0
+iface wan0 inet manual
 
 # LAN
 auto br0

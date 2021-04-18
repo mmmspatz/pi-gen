@@ -13,6 +13,7 @@ install -m 755 files/nftables.conf "${ROOTFS_DIR}/etc/"
 install -m 644 files/radvd.conf "${ROOTFS_DIR}/etc/"
 install -m 644 files/iperf3.service "${ROOTFS_DIR}/etc/systemd/system/"
 cat files/sshd_config.append >> "${ROOTFS_DIR}/etc/ssh/sshd_config"
+install -m 644 files/10-wan0.link "${ROOTFS_DIR}/etc/systemd/network/"
 
 # Enable services
 on_chroot << EOF
