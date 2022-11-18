@@ -32,7 +32,7 @@ copy_previous(){
 		echo "Previous stage rootfs not found"
 		false
 	fi
-	mkdir -p "${ROOTFS_DIR}"
+	mkdir "${ROOTFS_DIR}"
 	rsync -aHAXx --exclude var/cache/apt/archives "${PREV_ROOTFS_DIR}/" "${ROOTFS_DIR}/"
 }
 export -f copy_previous

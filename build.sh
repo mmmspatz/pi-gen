@@ -97,6 +97,9 @@ run_stage(){
 		fi
 	fi
 	if [ ! -f SKIP ]; then
+		if [ ! -d "${STAGE_WORK_DIR}" ]; then
+			mkdir "${STAGE_WORK_DIR}"
+		fi
 		if [ "${CLEAN}" = "1" ]; then
 			if [ -d "${ROOTFS_DIR}" ]; then
 				rm -rf "${ROOTFS_DIR}"
