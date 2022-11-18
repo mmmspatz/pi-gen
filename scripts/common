@@ -3,6 +3,16 @@ log (){
 }
 export -f log
 
+is_on_btrfs() {
+    [ "$(stat -f --format="%T" "$1")" == "btrfs" ]
+}
+export -f is_on_btrfs
+
+is_btrfs_subvolume() {
+    is_on_btrfs "$1" && [ "$(stat --format="%i" "$1")" == 256 ]
+}
+export -f is_btrfs_subvolume
+
 bootstrap(){
 	local BOOTSTRAP_CMD=debootstrap
 	local BOOTSTRAP_ARGS=()
@@ -16,6 +26,12 @@ bootstrap(){
 	BOOTSTRAP_ARGS+=(--include=ca-certificates)
 	BOOTSTRAP_ARGS+=("$@")
 	printf -v BOOTSTRAP_STR '%q ' "${BOOTSTRAP_ARGS[@]}"
+
+	if is_on_btrfs "$(dirname "$2")" && command -v btrfs > /dev/null; then
+		btrfs subvolume create "$2"
+	else
+		mkdir "$2"
+	fi
 
 	setarch linux32 capsh $CAPSH_ARG -- -c "'${BOOTSTRAP_CMD}' $BOOTSTRAP_STR" || true
 
@@ -32,8 +48,13 @@ copy_previous(){
 		echo "Previous stage rootfs not found"
 		false
 	fi
-	mkdir "${ROOTFS_DIR}"
-	rsync -aHAXx --exclude var/cache/apt/archives "${PREV_ROOTFS_DIR}/" "${ROOTFS_DIR}/"
+
+	if is_btrfs_subvolume "${PREV_ROOTFS_DIR}"; then
+		btrfs subvolume snapshot "${PREV_ROOTFS_DIR}" "${ROOTFS_DIR}"
+	else
+		mkdir "${ROOTFS_DIR}"
+		rsync -aHAXx --exclude var/cache/apt/archives "${PREV_ROOTFS_DIR}/" "${ROOTFS_DIR}/"
+	fi
 }
 export -f copy_previous
 
